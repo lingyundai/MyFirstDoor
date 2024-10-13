@@ -1,5 +1,6 @@
 import streamlit as st
 import components as cp
+import requests
 import House_details as hd
 import service as serv
 import housing as recommender
@@ -159,12 +160,118 @@ display_home_price = f"{max_home_price:.2f}"
 def show_budget():
     cp.sidebar_subtitle(f"Estimated Max Home Price: ${display_home_price}")
 
+
+#create a button and call the function if it's clicked
 # Generate Budget button
 if st.sidebar.button("Generate Budget"):
     show_budget()
     house = recommender.recommend_properties(main_df, selected_state, 100000, max_home_price, top_k=5)
     st.session_state['house'] = serv.parse_property_data(house)
     # st.rerun()
+
+#HMDA data
+url = "https://ffiec.cfpb.gov/v2/data-browser-api/view/nationwide/aggregations"
+years = [2023, 2022, 2021, 2020]
+#dictionary to store results by year
+yearly_data = {}
+for year in years:
+    total_approvals_for_year = 0
+    total_applications_for_year = 0
+
+    params = {
+    "years": year,
+    "states": selected_state,
+    "actions_taken": "1,2,3,4,5,6,7,8" #total applications
+    }
+    try:
+        #GET request
+        response = requests.get(url, params=params)
+        #print status code and response for debugging
+        print(f"Year {year} - Status code: {response.status_code}")
+        #check if the request was successful (status code 200)
+        if response.status_code == 200:
+            #parse JSON response
+            data = response.json()
+            for entry in data.get('aggregations', []):
+                if entry.get('actions_taken') in ['1', '2']:
+                    #only count approvals
+                    total_approvals_for_year += entry.get('count', 0)
+                #count all applications
+                total_applications_for_year += entry.get('count', 0)
+            #store data for the year
+            approval_rate = (total_approvals_for_year / total_applications_for_year) * 100 if total_applications_for_year > 0 else 0
+            yearly_data[year] = {
+                "total_approvals": total_approvals_for_year,
+                "total_applications": total_applications_for_year,
+                "approval_rate": approval_rate
+            }
+            print(f"Data received for {year}: {yearly_data[year]}")
+        else:
+            print(f"Error for year {year}: {response.status_code} {response.reason}")
+    except requests.exceptions.RequestException as e:
+        print(f"An error occurred for year {year}: {e}")
+
+for year, data in yearly_data.items():
+    print(f"Year: {year}")
+    print(f"  Total Approvals: {data['total_approvals']}")
+    print(f"  Total Applications: {data['total_applications']}")
+    print(f"  Approval Rate: {data['approval_rate']:.2f}%\n")
+
+#cp.sidebar_subtitle("Preferences")
+
+
+
+#num_bedrooms = cp.user_slider("How many bedrooms would you prefer to have?", 
+#              "So we can match you with homes that closely align with your preferences.")
+#num_bathrooms = cp.user_slider("How many bathrooms would you prefer to have?", 
+#              "So we can match you with homes that closely align with your preferences.")
+        
+#def filter_housing(budget, location):
+#    # Placeholder function: Replace with actual filtering logic
+#    data = {
+#        "Location": ["Location 1", "Location 2", "Location 3"],
+#        "Price": [1000, 1500, 2000]
+#    }
+#    df = pd.DataFrame(data)
+#    filtered_df = df[(df["Location"] == location) & (df["Price"] <= budget)]
+#    return filtered_df
+
+#st.markdown("<h1 style='text-align: center;'>Housing Navigator</h1>", unsafe_allow_html=True)
+
+##sidebar 
+#state = st.sidebar.selectbox("Select a state", 'California')
+
+
+#data = {
+#    #example data
+#    "Location": ["Location 1", "Location 2", "Location 3"],
+#    "Latitude": [37.7749, 34.0522, 40.7128],
+#    "Longitude": [-122.4194, -118.2437, -74.0060],
+#    "Price": [1000, 1500, 2000]
+#}
+#df = pd.DataFrame(data)
+
+#m = folium.Map(location=[df["Latitude"].mean(), df["Longitude"].mean()], zoom_start=2)
+#for idx, row in df.iterrows():
+#    folium.CircleMarker(
+#        location=[row["Latitude"], row["Longitude"]],
+#        radius=10,
+#        popup=f"{row['Location']}: ${row['Price']}",
+#        color='blue',
+#        fill=True,
+#        fill_color='blue'
+#    ).add_to(m)
+
+#For map and location specific data
+#col1, col2 = st.columns([2, 1]) 
+#with col1:
+#   st_folium(m, width=400, height=300)
+
+#with col2:
+#    location = st.selectbox("Select a location", df["Location"].values)
+    
+
+
 
 # Main content area
 
