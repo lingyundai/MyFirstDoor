@@ -6,3 +6,4 @@ folium.plugins
 folium
 random
 json
+plotly.express
