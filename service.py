@@ -1,5 +1,7 @@
 import streamlit as st
 import json
+import pandas as pd
+
 
 def load_session_state_from_json(file_path="state.json"):
     try:
@@ -47,3 +49,17 @@ def parse_property_data(data_string):
                 st.error(f"Error parsing item: {item}")
     
     return parsed_data
+
+# Load the data
+@st.cache_data
+def load_data():
+    data = pd.read_csv('data/historical_housing_price.csv', parse_dates=['Date'])
+    return data
+
+# Prepare the data
+def prepare_data(df, state):
+    df['Date'] = pd.to_datetime(df['Date'], format='%m/%d/%Y')
+    df = df[['Date', state]]
+    df = df.rename(columns={state: 'Price'})
+    df['State'] = state
+    return df
