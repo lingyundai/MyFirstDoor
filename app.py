@@ -57,67 +57,67 @@ with col1:
     st.title("Real Estate Listings")
     if st.session_state['house']:
         for property in st.session_state['house']:
-            hd.create_property_card(property, col1)
+            hd.create_property_card(property)
     else:
         st.write("No properties found. Please generate a budget to see listings.")
-    st.title("Interactive US Map with Property Details")
+    # st.title("Interactive US Map with Property Details")
 
-    # Generate mock dataset
-    properties = cp.generate_mock_data(15)  # Generate 15 random properties
+    # # Generate mock dataset
+    # properties = cp.generate_mock_data(15)  # Generate 15 random properties
     
-    # Calculate the center of all properties for initial map view
-    center_lat = sum(prop["latitude"] for prop in properties) / len(properties)
-    center_lon = sum(prop["longitude"] for prop in properties) / len(properties)
+    # # Calculate the center of all properties for initial map view
+    # center_lat = sum(prop["latitude"] for prop in properties) / len(properties)
+    # center_lon = sum(prop["longitude"] for prop in properties) / len(properties)
 
-    # Create the map
-    m = cp.create_map(center_lat, center_lon)
+    # # Create the map
+    # m = cp.create_map(center_lat, center_lon)
 
-    # Create a MarkerCluster
-    marker_cluster = MarkerCluster().add_to(m)
+    # # Create a MarkerCluster
+    # marker_cluster = MarkerCluster().add_to(m)
 
-    # Add markers for each property
-    for prop in properties:
-        popup_html = f"""
-        <img src="{prop['image_url']}" width="100%"><br>
-        <strong>Price:</strong> {prop['price']}<br>
-        <strong>Zip Code:</strong> {prop['zip_code']}<br>
-        <strong>Address:</strong> {prop['address']}
-        """
-        cp.add_marker(marker_cluster, prop["latitude"], prop["longitude"], popup_html)
+    # # Add markers for each property
+    # for prop in properties:
+    #     popup_html = f"""
+    #     <img src="{prop['image_url']}" width="100%"><br>
+    #     <strong>Price:</strong> {prop['price']}<br>
+    #     <strong>Zip Code:</strong> {prop['zip_code']}<br>
+    #     <strong>Address:</strong> {prop['address']}
+    #     """
+    #     cp.add_marker(marker_cluster, prop["latitude"], prop["longitude"], popup_html)
 
-    # Display the map
-    folium_static(m)
+    # # Display the map
+    # folium_static(m)
 
 
-    st.title('Housing Price Trend')
+    # st.title('Housing Price Trend')
 
-    # Load the data
-    df = sr.load_data()
+    # # Load the data
+    # df = sr.load_data()
 
-    # Assume the state is stored in a variable
-    # For demonstration, we'll use a text input to simulate this
-    state = st.text_input("Enter the state name (as it appears in the dataset):")
+    # # Assume the state is stored in a variable
+    # # For demonstration, we'll use a text input to simulate this
+    # state = st.text_input("Enter the state name (as it appears in the dataset):")
 
-    if state and state in df.columns:
-        # Prepare data for the selected state
-        state_df = sr.prepare_data(df, state)
+    # if state and state in df.columns:
+    #     # Prepare data for the selected state
+    #     state_df = sr.prepare_data(df, state)
 
-        # Create the line chart
-        fig = px.line(state_df, x='Date', y='Price',
-                        title=f'Housing Price Trend for {state}',
-                        labels={'Price': 'Housing Price', 'Date': 'Year'})
+    #     # Create the line chart
+    #     fig = px.line(state_df, x='Date', y='Price',
+    #                     title=f'Housing Price Trend for {state}',
+    #                     labels={'Price': 'Housing Price', 'Date': 'Year'})
 
-        # Customize the chart
-        fig.update_layout(showlegend=False)
-        fig.update_xaxes(title_text='Year and Month ')
-        fig.update_yaxes(title_text='Housing Price ')
+    #     # Customize the chart
+    #     fig.update_layout(showlegend=False)
+    #     fig.update_xaxes(title_text='Year and Month ')
+    #     fig.update_yaxes(title_text='Housing Price ')
 
-        # Display the chart
-        st.plotly_chart(fig)
-    elif state:
-        st.error(f"State '{state}' not found in the dataset. Please check the spelling and try again.")
-    else:
-        st.write('Please enter a state name to display the trend.')
+    #     # Display the chart
+    #     st.plotly_chart(fig)
+    # elif state:
+    #     st.error(f"State '{state}' not found in the dataset. Please check the spelling and try again.")
+    # else:
+    #     st.write('Please enter a state name to display the trend.')
 
 
 # # Content for the right "sidebar"
@@ -166,11 +166,3 @@ if st.sidebar.button("Generate Budget"):
     st.session_state['house'] = serv.parse_property_data(house)
     # st.rerun()
 
-# Main content area
-
-st.title("Real Estate Listings")
-if st.session_state['house']:
-    for property in st.session_state['house']:
-        hd.create_property_card(property)
-else:
-    st.write("No properties found. Please generate a budget to see listings.")
