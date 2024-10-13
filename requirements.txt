@@ -3,6 +3,4 @@ pandas
 streamlit_card
 streamlit_folium
 folium
-random
-json
 plotly
