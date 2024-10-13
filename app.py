@@ -81,31 +81,10 @@ if st.sidebar.button("Generate Budget"):
     # st.rerun()
 
 # Main content area
-col1, col2 = st.columns([5, 1])
 
-with col1:
-    st.title("Real Estate Listings")
-    if st.session_state['house']:
-        for property in st.session_state['house']:
-            hd.create_property_card(property, col1)
-    else:
-        st.write("No properties found. Please generate a budget to see listings.")
-    # if st.session_state['house']:
-    #     for i, property in enumerate(st.session_state['house']):
-    #         hd.create_property_card(property, col1 if i % 2 == 0 else col2)
-    # else:
-        # st.write("No properties found. Please generate a budget to see listings.")
-
-# Preferences in the right column
-with col2:
-    st.subheader("Preferences")
-    num_bedrooms = cp.user_slider("How many bedrooms would you prefer to have?", 
-              "So we can match you with homes that closely align with your preferences.")
-    num_bathrooms = cp.user_slider("How many bathrooms would you prefer to have?", 
-              "So we can match you with homes that closely align with your preferences.")
-
-# # Display selected property details (if any)
-# if 'selected_property' in st.session_state:
-#     selected_property = next((p for p in st.session_state['house'] if p['unique_id'] == st.session_state.selected_property), None)
-    # if selected_property:
-        # hd.display_property_details(selected_property)
+st.title("Real Estate Listings")
+if st.session_state['house']:
+    for property in st.session_state['house']:
+        hd.create_property_card(property)
+else:
+    st.write("No properties found. Please generate a budget to see listings.")
