@@ -66,52 +66,8 @@ cp.title()
 
 cp.main_subtitle("Recommending the right home, just for you.")
 
-col1, col2 = st.columns([3, 1])
+col1, col2 = st.columns([7, 1])
 
-# Main content area
-with col1:
-    st.title("Real Estate Listings")
-    if st.session_state['house']:
-        for property in st.session_state['house']:
-            hd.create_property_card(property)
-    else:
-        st.write("No properties found. Please generate a budget to see listings.")
-    st.title("Interactive US Map with Property Details")
-
-    # Generate mock dataset
-    properties = cp.generate_mock_data(15)  # Generate 15 random properties
-    
-    # Calculate the center of all properties for initial map view
-    center_lat = sum(prop["latitude"] for prop in properties) / len(properties)
-    center_lon = sum(prop["longitude"] for prop in properties) / len(properties)
-
-    # Create the map
-    m = cp.create_map(center_lat, center_lon)
-
-    # Create a MarkerCluster
-    marker_cluster = MarkerCluster().add_to(m)
-
-    # Add markers for each property
-    for prop in properties:
-        popup_html = f"""
-        <img src="{prop['image_url']}" width="100%"><br>
-        <strong>Price:</strong> {prop['price']}<br>
-        <strong>Zip Code:</strong> {prop['zip_code']}<br>
-        <strong>Address:</strong> {prop['address']}
-        """
-        cp.add_marker(marker_cluster, prop["latitude"], prop["longitude"], popup_html)
-
-    # Display the map
-    folium_static(m)
-
-
-# # Content for the right "sidebar"
-# with col2:
-#     st.subheader("Preferences")
-#     num_bedrooms = cp.user_slider("How many bedrooms would you prefer to have?", 
-#               "So we can match you with homes that closely align with your preferences.", 0)
-#     num_bathrooms = cp.user_slider("How many bathrooms would you prefer to have?", 
-#               "So we can match you with homes that closely align with your preferences.", 1)
 
 # Create the dropdown menu with state acronyms
 cp.sidebar_subtitle("Location")
@@ -161,8 +117,11 @@ with col1:
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
             hd.show_map()
+        plot1,plot2, plot3 = st.columns([1, 7, 1])
+        with plot2:
+            pt.trend_plot(get_state_name(selected_state))
+            hmda.hmda_plot(selected_state, get_state_name(selected_state))
     else:
         st.write("No properties found. Please generate a budget to see listings.")
 
-pt.trend_plot(get_state_name(selected_state))
-hmda.hmda_plot(selected_state, get_state_name(selected_state))
+
