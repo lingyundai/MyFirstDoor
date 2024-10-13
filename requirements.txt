@@ -1,0 +1,8 @@
+streamlit
+pandas
+streamlit_card
+streamlit_folium
+folium.plugins
+folium
+random
+json
