@@ -1,9 +1,10 @@
 import streamlit as st
 import components as cp
-import requests
 import House_details as hd
 import service as serv
 import housing as recommender
+import price_trend as pt
+import hmda
 import pandas as pd
 import ast
 from streamlit_card import card
@@ -20,8 +21,6 @@ if 'house' not in st.session_state:
     st.session_state['house'] = []
 
 house = []
-
-
 
 custom_css = """
 <style>
@@ -46,11 +45,73 @@ state_acronyms = [
     "DC"
 ]
 
+state_abbreviations = {
+    "AL": "Alabama", "AK": "Alaska", "AZ": "Arizona", "AR": "Arkansas", "CA": "California", "CO": "Colorado",
+    "CT": "Connecticut", "DE": "Delaware","DC": "District of Columbia", "FL": "Florida", "GA": "Georgia", 
+    "HI": "Hawaii", "ID": "Idaho", "IL": "Illinois", "IN": "Indiana", "IA": "Iowa", "KS": "Kansas",
+    "KY": "Kentucky", "LA": "Louisiana", "ME": "Maine", "MD": "Maryland", "MA": "Massachusetts", 
+    "MI": "Michigan", "MN": "Minnesota", "MS": "Mississippi", "MO": "Missouri", "MT": "Montana",
+    "NE": "Nebraska", "NV": "Nevada", "NH": "New Hampshire", "NJ": "New Jersey", "NM": "New Mexico",
+    "NY": "New York", "NC": "North Carolina", "ND": "North Dakota", "OH": "Ohio", "OK": "Oklahoma",
+    "OR": "Oregon", "PA": "Pennsylvania", "RI": "Rhode Island", "SC": "South Carolina", "SD": "South Dakota", 
+    "TN": "Tennessee", "TX": "Texas", "UT": "Utah", "VT": "Vermont", "VA": "Virginia", "WA": "Washington", 
+    "WV": "West Virginia", "WI": "Wisconsin", "WY": "Wyoming"
+}
+
+#get full state name from abbreviation
+def get_state_name(abbreviation):
+    return state_abbreviations.get(abbreviation, "other")
+
 cp.title()
 
 cp.main_subtitle("Recommending the right home, just for you.")
 
 col1, col2 = st.columns([3, 1])
+
+# Main content area
+with col1:
+    st.title("Real Estate Listings")
+    if st.session_state['house']:
+        for property in st.session_state['house']:
+            hd.create_property_card(property)
+    else:
+        st.write("No properties found. Please generate a budget to see listings.")
+    st.title("Interactive US Map with Property Details")
+
+    # Generate mock dataset
+    properties = cp.generate_mock_data(15)  # Generate 15 random properties
+    
+    # Calculate the center of all properties for initial map view
+    center_lat = sum(prop["latitude"] for prop in properties) / len(properties)
+    center_lon = sum(prop["longitude"] for prop in properties) / len(properties)
+
+    # Create the map
+    m = cp.create_map(center_lat, center_lon)
+
+    # Create a MarkerCluster
+    marker_cluster = MarkerCluster().add_to(m)
+
+    # Add markers for each property
+    for prop in properties:
+        popup_html = f"""
+        <img src="{prop['image_url']}" width="100%"><br>
+        <strong>Price:</strong> {prop['price']}<br>
+        <strong>Zip Code:</strong> {prop['zip_code']}<br>
+        <strong>Address:</strong> {prop['address']}
+        """
+        cp.add_marker(marker_cluster, prop["latitude"], prop["longitude"], popup_html)
+
+    # Display the map
+    folium_static(m)
+
+
+# # Content for the right "sidebar"
+# with col2:
+#     st.subheader("Preferences")
+#     num_bedrooms = cp.user_slider("How many bedrooms would you prefer to have?", 
+#               "So we can match you with homes that closely align with your preferences.", 0)
+#     num_bathrooms = cp.user_slider("How many bathrooms would you prefer to have?", 
+#               "So we can match you with homes that closely align with your preferences.", 1)
 
 # Create the dropdown menu with state acronyms
 cp.sidebar_subtitle("Location")
@@ -81,11 +142,10 @@ max_home_price = loan_amount + down_payment
 display_home_price = f"{max_home_price:.2f}"
 
 def show_budget():
-    cp.sidebar_subtitle(f"Estimated Max Home Price: ${display_home_price}")
-
+    cp.sidebar_subtitle(f"Estimated Home Budget: ${display_home_price}")
 
 #create a button and call the function if it's clicked
-# Generate Budget button
+#generate Budget button
 if st.sidebar.button("Generate Budget"):
     show_budget()
     house = recommender.recommend_properties(main_df, selected_state, 100000, max_home_price, top_k=5)
@@ -104,50 +164,5 @@ with col1:
     else:
         st.write("No properties found. Please generate a budget to see listings.")
 
-#HMDA data
-url = "https://ffiec.cfpb.gov/v2/data-browser-api/view/nationwide/aggregations"
-years = [2023, 2022, 2021, 2020]
-#dictionary to store results by year
-yearly_data = {}
-for year in years:
-    total_approvals_for_year = 0
-    total_applications_for_year = 0
-
-    params = {
-    "years": year,
-    "states": selected_state,
-    "actions_taken": "1,2,3,4,5,6,7,8" #total applications
-    }
-    try:
-        #GET request
-        response = requests.get(url, params=params)
-        #print status code and response for debugging
-        print(f"Year {year} - Status code: {response.status_code}")
-        #check if the request was successful (status code 200)
-        if response.status_code == 200:
-            #parse JSON response
-            data = response.json()
-            for entry in data.get('aggregations', []):
-                if entry.get('actions_taken') in ['1', '2']:
-                    #only count approvals
-                    total_approvals_for_year += entry.get('count', 0)
-                #count all applications
-                total_applications_for_year += entry.get('count', 0)
-            #store data for the year
-            approval_rate = (total_approvals_for_year / total_applications_for_year) * 100 if total_applications_for_year > 0 else 0
-            yearly_data[year] = {
-                "total_approvals": total_approvals_for_year,
-                "total_applications": total_applications_for_year,
-                "approval_rate": approval_rate
-            }
-            print(f"Data received for {year}: {yearly_data[year]}")
-        else:
-            print(f"Error for year {year}: {response.status_code} {response.reason}")
-    except requests.exceptions.RequestException as e:
-        print(f"An error occurred for year {year}: {e}")
-
-for year, data in yearly_data.items():
-    print(f"Year: {year}")
-    print(f"  Total Approvals: {data['total_approvals']}")
-    print(f"  Total Applications: {data['total_applications']}")
-    print(f"  Approval Rate: {data['approval_rate']:.2f}%\n")
+pt.trend_plot(get_state_name(selected_state))
+hmda.hmda_plot(selected_state, get_state_name(selected_state))
