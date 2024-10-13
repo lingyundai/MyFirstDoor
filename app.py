@@ -61,33 +61,33 @@ with col1:
             hd.create_property_card(property)
     else:
         st.write("No properties found. Please generate a budget to see listings.")
-    # st.title("Interactive US Map with Property Details")
+    st.title("Interactive US Map with Property Details")
 
-    # # Generate mock dataset
-    # properties = cp.generate_mock_data(15)  # Generate 15 random properties
+    # Generate mock dataset
+    properties = cp.generate_mock_data(15)  # Generate 15 random properties
     
-    # # Calculate the center of all properties for initial map view
-    # center_lat = sum(prop["latitude"] for prop in properties) / len(properties)
-    # center_lon = sum(prop["longitude"] for prop in properties) / len(properties)
+    # Calculate the center of all properties for initial map view
+    center_lat = sum(prop["latitude"] for prop in properties) / len(properties)
+    center_lon = sum(prop["longitude"] for prop in properties) / len(properties)
 
-    # # Create the map
-    # m = cp.create_map(center_lat, center_lon)
+    # Create the map
+    m = cp.create_map(center_lat, center_lon)
 
-    # # Create a MarkerCluster
-    # marker_cluster = MarkerCluster().add_to(m)
+    # Create a MarkerCluster
+    marker_cluster = MarkerCluster().add_to(m)
 
-    # # Add markers for each property
-    # for prop in properties:
-    #     popup_html = f"""
-    #     <img src="{prop['image_url']}" width="100%"><br>
-    #     <strong>Price:</strong> {prop['price']}<br>
-    #     <strong>Zip Code:</strong> {prop['zip_code']}<br>
-    #     <strong>Address:</strong> {prop['address']}
-    #     """
-    #     cp.add_marker(marker_cluster, prop["latitude"], prop["longitude"], popup_html)
+    # Add markers for each property
+    for prop in properties:
+        popup_html = f"""
+        <img src="{prop['image_url']}" width="100%"><br>
+        <strong>Price:</strong> {prop['price']}<br>
+        <strong>Zip Code:</strong> {prop['zip_code']}<br>
+        <strong>Address:</strong> {prop['address']}
+        """
+        cp.add_marker(marker_cluster, prop["latitude"], prop["longitude"], popup_html)
 
-    # # Display the map
-    # folium_static(m)
+    # Display the map
+    folium_static(m)
 
 
     # st.title('Housing Price Trend')
