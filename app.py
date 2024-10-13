@@ -1,5 +1,6 @@
 import streamlit as st
 import components as cp
+import requests
 
 custom_css = """
 <style>
@@ -95,9 +96,58 @@ display_home_price = f"Based on your financial inputs, we recommend a budget of 
 def show_budget():
     cp.sidebar_subtitle(display_home_price)
 
+
 #create a button and call the function if it's clicked
 if st.sidebar.button("Generate Budget"):
     show_budget()
+
+#HMDA data
+url = "https://ffiec.cfpb.gov/v2/data-browser-api/view/nationwide/aggregations"
+years = [2023, 2022, 2021, 2020]
+#dictionary to store results by year
+yearly_data = {}
+for year in years:
+    total_approvals_for_year = 0
+    total_applications_for_year = 0
+
+    params = {
+    "years": year,
+    "states": selected_state,
+    "actions_taken": "1,2,3,4,5,6,7,8" #total applications
+    }
+    try:
+        #GET request
+        response = requests.get(url, params=params)
+        #print status code and response for debugging
+        print(f"Year {year} - Status code: {response.status_code}")
+        #check if the request was successful (status code 200)
+        if response.status_code == 200:
+            #parse JSON response
+            data = response.json()
+            for entry in data.get('aggregations', []):
+                if entry.get('actions_taken') in ['1', '2']:
+                    #only count approvals
+                    total_approvals_for_year += entry.get('count', 0)
+                #count all applications
+                total_applications_for_year += entry.get('count', 0)
+            #store data for the year
+            approval_rate = (total_approvals_for_year / total_applications_for_year) * 100 if total_applications_for_year > 0 else 0
+            yearly_data[year] = {
+                "total_approvals": total_approvals_for_year,
+                "total_applications": total_applications_for_year,
+                "approval_rate": approval_rate
+            }
+            print(f"Data received for {year}: {yearly_data[year]}")
+        else:
+            print(f"Error for year {year}: {response.status_code} {response.reason}")
+    except requests.exceptions.RequestException as e:
+        print(f"An error occurred for year {year}: {e}")
+
+for year, data in yearly_data.items():
+    print(f"Year: {year}")
+    print(f"  Total Approvals: {data['total_approvals']}")
+    print(f"  Total Applications: {data['total_applications']}")
+    print(f"  Approval Rate: {data['approval_rate']:.2f}%\n")
 
 #cp.sidebar_subtitle("Preferences")
 
