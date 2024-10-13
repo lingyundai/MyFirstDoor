@@ -4,3 +4,4 @@ streamlit_card
 streamlit_folium
 folium
 plotly
+openpyxl
