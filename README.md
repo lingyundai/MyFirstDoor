@@ -36,17 +36,6 @@ streamlit run app.py
 
 Then open your web browser and go to `http://localhost:8501`.
 
-## Technologies Used
-
-- Python
-- Streamlit
-- Pandas
-- Streamlit_card
-- Streamlit_folium
-- Folium
-- Plotly
-- Openpyxl
-
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
