@@ -270,14 +270,3 @@ for year, data in yearly_data.items():
 #with col2:
 #    location = st.selectbox("Select a location", df["Location"].values)
     
-
-
-
-# Main content area
-
-st.title("Real Estate Listings")
-if st.session_state['house']:
-    for property in st.session_state['house']:
-        hd.create_property_card(property)
-else:
-    st.write("No properties found. Please generate a budget to see listings.")
