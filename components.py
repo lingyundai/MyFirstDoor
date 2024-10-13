@@ -21,10 +21,10 @@ def user_input(content, placeholder, helpMessage):
 def generate():
     st.sidebar.button("Generate budget")
 
-def user_slider(content, helpMessage):
+def user_slider(content, helpMessage, key):
     value = st.slider(content, 
                       min_value=0, max_value=10,
-                            help=helpMessage)
+                            help=helpMessage, key=key)
     return int(value)
 
 # Function to create the map
