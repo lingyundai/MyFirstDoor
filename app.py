@@ -13,7 +13,6 @@ import service as sr
 import plotly.express as px
 import requests
 import io
-import pandas as pd
 
 # Initialize session state
 if 'house' not in st.session_state:
@@ -55,10 +54,12 @@ col1, col2 = st.columns([3, 1])
 
 # Main content area
 with col1:
-    st.subheader("Main Area")
-    st.write("This is the main content area. Here you can display your main application content.")
-    st.text_input("Enter something for the main area:")
-    st.button("Submit")
+    st.title("Real Estate Listings")
+    if st.session_state['house']:
+        for property in st.session_state['house']:
+            hd.create_property_card(property, col1)
+    else:
+        st.write("No properties found. Please generate a budget to see listings.")
     st.title("Interactive US Map with Property Details")
 
     # Generate mock dataset
@@ -119,13 +120,13 @@ with col1:
         st.write('Please enter a state name to display the trend.')
 
 
-# Content for the right "sidebar"
-with col2:
-    st.subheader("Preferences")
-    num_bedrooms = cp.user_slider("How many bedrooms would you prefer to have?", 
-              "So we can match you with homes that closely align with your preferences.", 0)
-    num_bathrooms = cp.user_slider("How many bathrooms would you prefer to have?", 
-              "So we can match you with homes that closely align with your preferences.", 1)
+# # Content for the right "sidebar"
+# with col2:
+#     st.subheader("Preferences")
+#     num_bedrooms = cp.user_slider("How many bedrooms would you prefer to have?", 
+#               "So we can match you with homes that closely align with your preferences.", 0)
+#     num_bathrooms = cp.user_slider("How many bathrooms would you prefer to have?", 
+#               "So we can match you with homes that closely align with your preferences.", 1)
 
 # Create the dropdown menu with state acronyms
 cp.sidebar_subtitle("Location")
