@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 import streamlit as st
+import json
 
 # Define the path to the OneDrive folder
 onedrive_path = os.path.expanduser('/Users/ankitkumar/Library/CloudStorage/OneDrive-GeorgeMasonUniversity-O365Production/HackFax/')
@@ -40,7 +41,8 @@ def recommend_properties(df, state, min_price, max_price, top_k=5):
     
     # Prepare the result
     result = recommendations[output_columns]
+    result_json = result.to_json(orient='records')
     
     # Convert to JSON format if needed
-    return st.json(result.to_dict(orient='records'))
+    return result_json
 
