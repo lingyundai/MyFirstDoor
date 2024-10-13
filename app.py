@@ -66,7 +66,6 @@ cp.title()
 
 cp.main_subtitle("Recommending the right home, just for you.")
 
-# Side bar and main area after user signed in
 col1, col2 = st.columns([3, 1])
 
 # Main content area
@@ -74,7 +73,7 @@ with col1:
     st.title("Real Estate Listings")
     if st.session_state['house']:
         for property in st.session_state['house']:
-            hd.create_property_card(property, col1)
+            hd.create_property_card(property)
     else:
         st.write("No properties found. Please generate a budget to see listings.")
     st.title("Interactive US Map with Property Details")
@@ -151,72 +150,19 @@ if st.sidebar.button("Generate Budget"):
     show_budget()
     house = recommender.recommend_properties(main_df, selected_state, 100000, max_home_price, top_k=5)
     st.session_state['house'] = serv.parse_property_data(house)
-    # st.rerun()
+
+# Main content area
+with col1:
+    st.title("Real Estate Listings")
+    if st.session_state['house']:
+        for property in st.session_state['house']:
+            hd.create_property_card(property)
+            # Display property location on a map using st.session_state['house']
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            hd.show_map()
+    else:
+        st.write("No properties found. Please generate a budget to see listings.")
 
 pt.trend_plot(get_state_name(selected_state))
 hmda.hmda_plot(selected_state, get_state_name(selected_state))
-
-#cp.sidebar_subtitle("Preferences")
-
-
-
-#num_bedrooms = cp.user_slider("How many bedrooms would you prefer to have?", 
-#              "So we can match you with homes that closely align with your preferences.")
-#num_bathrooms = cp.user_slider("How many bathrooms would you prefer to have?", 
-#              "So we can match you with homes that closely align with your preferences.")
-        
-#def filter_housing(budget, location):
-#    # Placeholder function: Replace with actual filtering logic
-#    data = {
-#        "Location": ["Location 1", "Location 2", "Location 3"],
-#        "Price": [1000, 1500, 2000]
-#    }
-#    df = pd.DataFrame(data)
-#    filtered_df = df[(df["Location"] == location) & (df["Price"] <= budget)]
-#    return filtered_df
-
-#st.markdown("<h1 style='text-align: center;'>Housing Navigator</h1>", unsafe_allow_html=True)
-
-##sidebar 
-#state = st.sidebar.selectbox("Select a state", 'California')
-
-
-#data = {
-#    #example data
-#    "Location": ["Location 1", "Location 2", "Location 3"],
-#    "Latitude": [37.7749, 34.0522, 40.7128],
-#    "Longitude": [-122.4194, -118.2437, -74.0060],
-#    "Price": [1000, 1500, 2000]
-#}
-#df = pd.DataFrame(data)
-
-#m = folium.Map(location=[df["Latitude"].mean(), df["Longitude"].mean()], zoom_start=2)
-#for idx, row in df.iterrows():
-#    folium.CircleMarker(
-#        location=[row["Latitude"], row["Longitude"]],
-#        radius=10,
-#        popup=f"{row['Location']}: ${row['Price']}",
-#        color='blue',
-#        fill=True,
-#        fill_color='blue'
-#    ).add_to(m)
-
-#For map and location specific data
-#col1, col2 = st.columns([2, 1]) 
-#with col1:
-#   st_folium(m, width=400, height=300)
-
-#with col2:
-#    location = st.selectbox("Select a location", df["Location"].values)
-    
-
-
-
-# Main content area
-
-st.title("Real Estate Listings")
-if st.session_state['house']:
-    for property in st.session_state['house']:
-        hd.create_property_card(property)
-else:
-    st.write("No properties found. Please generate a budget to see listings.")
