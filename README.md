@@ -1,8 +1,15 @@
-# My First Door 🏠
+<br/>
+<div align="center">
+
+<h3 align="center">My First Door 🏠</h3>
+<p align="center">
+
+My First Door is an interactive mortgage and property recommendation system that helps you find the perfect home within your budget.
 
 ![icon](https://github.com/lingyundai/my-first-door/blob/main/myfirstdoor-logo.png)
 
-My First Door is an interactive mortgage and property recommendation system that helps you find the perfect home within your budget.
+<br>
+</div>
 
 ## Installation
 
