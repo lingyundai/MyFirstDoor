@@ -1,7 +1,13 @@
 import streamlit as st
 import components as cp
+from streamlit_folium import folium_static
+from folium.plugins import MarkerCluster
+import service as sr
+import plotly.express as px
+import requests
+import io
+import pandas as pd
 
-# Side bar and main area after user signed in
 col1, col2 = st.columns([3, 12])
 
 cp.title()
@@ -72,57 +78,61 @@ num_bedrooms = cp.user_slider("How many bedrooms would you prefer to have?",
 num_bathrooms = cp.user_slider("How many bathrooms would you prefer to have?", 
               "So we can match you with homes that closely align with your preferences.")
 
-#import streamlit as st
-#import pandas as pd
-#import numpy as np
-#import folium
-#from streamlit_folium import st_folium
+st.title("Interactive US Map with Property Details")
 
-#def filter_housing(budget, location):
-#    # Placeholder function: Replace with actual filtering logic
-#    data = {
-#        "Location": ["Location 1", "Location 2", "Location 3"],
-#        "Price": [1000, 1500, 2000]
-#    }
-#    df = pd.DataFrame(data)
-#    filtered_df = df[(df["Location"] == location) & (df["Price"] <= budget)]
-#    return filtered_df
+# Generate mock dataset
+properties = cp.generate_mock_data(15)  # Generate 15 random properties
 
-#st.markdown("<h1 style='text-align: center;'>Housing Navigator</h1>", unsafe_allow_html=True)
+# Calculate the center of all properties for initial map view
+center_lat = sum(prop["latitude"] for prop in properties) / len(properties)
+center_lon = sum(prop["longitude"] for prop in properties) / len(properties)
 
-##sidebar 
-#state = st.sidebar.selectbox("Select a state", 'California')
+# Create the map
+m = cp.create_map(center_lat, center_lon)
 
+# Create a MarkerCluster
+marker_cluster = MarkerCluster().add_to(m)
 
-#data = {
-#    #example data
-#    "Location": ["Location 1", "Location 2", "Location 3"],
-#    "Latitude": [37.7749, 34.0522, 40.7128],
-#    "Longitude": [-122.4194, -118.2437, -74.0060],
-#    "Price": [1000, 1500, 2000]
-#}
-#df = pd.DataFrame(data)
+# Add markers for each property
+for prop in properties:
+    popup_html = f"""
+    <img src="{prop['image_url']}" width="100%"><br>
+    <strong>Price:</strong> {prop['price']}<br>
+    <strong>Zip Code:</strong> {prop['zip_code']}<br>
+    <strong>Address:</strong> {prop['address']}
+    """
+    cp.add_marker(marker_cluster, prop["latitude"], prop["longitude"], popup_html)
 
-#m = folium.Map(location=[df["Latitude"].mean(), df["Longitude"].mean()], zoom_start=2)
-#for idx, row in df.iterrows():
-#    folium.CircleMarker(
-#        location=[row["Latitude"], row["Longitude"]],
-#        radius=10,
-#        popup=f"{row['Location']}: ${row['Price']}",
-#        color='blue',
-#        fill=True,
-#        fill_color='blue'
-#    ).add_to(m)
-
-#For map and location specific data
-#col1, col2 = st.columns([2, 1]) 
-#with col1:
-#   st_folium(m, width=400, height=300)
-
-#with col2:
-#    location = st.selectbox("Select a location", df["Location"].values)
-    
+# Display the map
+folium_static(m)
 
 
+st.title('Housing Price Trend')
 
+# Load the data
+df = sr.load_data()
 
+# Assume the state is stored in a variable
+# For demonstration, we'll use a text input to simulate this
+state = st.text_input("Enter the state name (as it appears in the dataset):")
+
+if state and state in df.columns:
+    # Prepare data for the selected state
+    state_df = sr.prepare_data(df, state)
+
+    # Create the line chart
+    fig = px.line(state_df, x='Date', y='Price',
+                    title=f'Housing Price Trend for {state}',
+                    labels={'Price': 'Housing Price', 'Date': 'Year'})
+
+    # Customize the chart
+    fig.update_layout(showlegend=False)
+    fig.update_xaxes(title_text='Year and Month ')
+    fig.update_yaxes(title_text='Housing Price ')
+
+    # Display the chart
+    st.plotly_chart(fig)
+elif state:
+    st.error(f"State '{state}' not found in the dataset. Please check the spelling and try again.")
+else:
+    st.write('Please enter a state name to display the trend.')
