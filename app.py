@@ -50,21 +50,7 @@ cp.title()
 
 cp.main_subtitle("Recommending the right home, just for you.")
 
-# Side bar and main area after user signed in
 col1, col2 = st.columns([3, 1])
-
-# Main content area
-with col1:
-    st.title("Real Estate Listings")
-    if st.session_state['house']:
-        for property in st.session_state['house']:
-            hd.create_property_card(property)
-            # Display property location on a map using st.session_state['house']
-        col1, col2, col3 = st.columns([1, 2, 1])
-        with col2:
-            hd.show_map()
-    else:
-        st.write("No properties found. Please generate a budget to see listings.")
 
 # Create the dropdown menu with state acronyms
 cp.sidebar_subtitle("Location")
@@ -104,6 +90,19 @@ if st.sidebar.button("Generate Budget"):
     show_budget()
     house = recommender.recommend_properties(main_df, selected_state, 100000, max_home_price, top_k=5)
     st.session_state['house'] = serv.parse_property_data(house)
+
+# Main content area
+with col1:
+    st.title("Real Estate Listings")
+    if st.session_state['house']:
+        for property in st.session_state['house']:
+            hd.create_property_card(property)
+            # Display property location on a map using st.session_state['house']
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            hd.show_map()
+    else:
+        st.write("No properties found. Please generate a budget to see listings.")
 
 #HMDA data
 url = "https://ffiec.cfpb.gov/v2/data-browser-api/view/nationwide/aggregations"
