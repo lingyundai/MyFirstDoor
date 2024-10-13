@@ -1,5 +1,7 @@
 import os
 import pandas as pd
+import streamlit as st
+import json
 
 # Define the path to the OneDrive folder
 onedrive_path = os.path.expanduser('/Users/ankitkumar/Library/CloudStorage/OneDrive-GeorgeMasonUniversity-O365Production/HackFax/')
@@ -21,7 +23,6 @@ def read_excel_from_onedrive(file_name):
 main_df = read_excel_from_onedrive('Zillow.com House Price Prediction Data(1).xlsx')
 # add unique identifier column
 main_df['unique_id'] = main_df.index + 1
-main_df.head()
 
 # Function to recommend properties based on state and price range
 def recommend_properties(df, state, min_price, max_price, top_k=5):
@@ -40,12 +41,8 @@ def recommend_properties(df, state, min_price, max_price, top_k=5):
     
     # Prepare the result
     result = recommendations[output_columns]
+    result_json = result.to_json(orient='records')
     
     # Convert to JSON format if needed
-    return result.to_json(orient='records', date_format='iso')
+    return result_json
 
-# Example usage
-state_input = 'CA'  # Example state input
-min_price_input = 100000  # Example minimum price input
-max_price_input = 900000  # Example maximum price input
-json_output = recommend_properties(main_df, state_input, min_price_input, max_price_input,top_k=5)
