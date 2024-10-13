@@ -17,6 +17,7 @@ def create_property_card(property):
         with tab1:
             st.write(f"Year Built: {property['yearBuilt']}")
             st.write(f"Address: {property['streetAddress']}, {property['county']}, {property['state']}, USA, {property['zipcode']}")
+            st.write(f"Price: ${property['price']}")
 
         with tab2:
             # Create a dropdown for schools

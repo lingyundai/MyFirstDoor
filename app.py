@@ -33,7 +33,7 @@ custom_css = """
 """
 st.markdown(custom_css, unsafe_allow_html=True)
 
-main_df = recommender.read_excel_from_onedrive('Zillow.com House Price Prediction Data(1).xlsx')
+main_df = recommender.read_excel_from_onedrive('data/Zillow.com House Price Prediction Data(1).xlsx')
 main_df['unique_id'] = main_df.index + 1
 
 state_acronyms = [

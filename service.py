@@ -46,7 +46,8 @@ def parse_property_data(data_string):
                 
                 parsed_data.append(parsed_item)
             except json.JSONDecodeError:
-                st.error(f"Error parsing item: {item}")
+                # Suppress the error and skip the item
+                continue
     
     return parsed_data
 
