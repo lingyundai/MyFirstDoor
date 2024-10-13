@@ -27,7 +27,7 @@ def create_property_card(property):
         with tab2:
             # Create a dropdown for schools
             school_names = [school['name'] for school in property['schools']]
-            selected_school = st.selectbox("Schools", school_names)
+            selected_school = st.selectbox("Schools", school_names, key=f"school_{property['streetAddress']}")
 
             # Display selected school details
             if selected_school:
