@@ -25,9 +25,8 @@ def trend_plot(selected_state):
 
         # Customize the chart
         fig.update_layout(showlegend=False)
-        fig.update_xaxes(title_text='Year and Month ')
-        fig.update_xaxes(tickmode='linear')
-        fig.update_yaxes(title_text='Housing Price ')
+        fig.update_xaxes(title_text='Year')
+        fig.update_yaxes(title_text='Avergae Home Price ($)')
 
         fig.update_layout(title_font=dict(size=24))
         # Display the chart
