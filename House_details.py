@@ -3,7 +3,7 @@ import streamlit as st
 
 # Function to create a card for each property
 def create_property_card(property):
-    col1, col2 = st.columns([2, 4])
+    col1, col2 = st.columns([3, 5])
     with col1:
         card(
             title=property['streetAddress'],
