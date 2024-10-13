@@ -109,7 +109,7 @@ if st.sidebar.button("Generate Budget"):
 
 # Main content area
 with col1:
-    st.title("Real Estate Listings")
+    st.title("Property Listings and Analysis")
     if st.session_state['house']:
         for property in st.session_state['house']:
             hd.create_property_card(property)
@@ -122,6 +122,6 @@ with col1:
             pt.trend_plot(get_state_name(selected_state))
             hmda.hmda_plot(selected_state, get_state_name(selected_state))
     else:
-        st.write("No properties found. Please generate a budget to see listings.")
+        st.write("No properties found. Please generate a budget to see listings and property analysis.")
 
 
