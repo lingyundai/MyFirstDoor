@@ -12,14 +12,14 @@ def sidebar_subtitle(text):
 def user_input(content, placeholder, helpMessage):
     value = st.sidebar.number_input(content,
                             placeholder=placeholder,
-                            help=helpMessage)
+                            help=helpMessage, step=0)
     return float(value)
 
 def generate():
     st.sidebar.button("Generate budget")
 
 def user_slider(content, helpMessage):
-    value = st.sidebar.slider(content, 
+    value = st.slider(content, 
                       min_value=0, max_value=10,
                             help=helpMessage)
     return int(value)

@@ -1,33 +1,65 @@
 import streamlit as st
 import components as cp
 
-# Side bar and main area after user signed in
-col1, col2 = st.columns([3, 12])
+custom_css = """
+<style>
+.st-emotion-cache-13ln4jf {
+    padding-left: 2rem;
+    padding-right: 4rem;
+    max-width: none !important;
+}
+</style>
+"""
+st.markdown(custom_css, unsafe_allow_html=True)
+
+state_acronyms = [
+    "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA",
+    "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD",
+    "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ",
+    "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC",
+    "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY",
+    "DC"
+]
 
 cp.title()
 
 cp.main_subtitle("Recommending the right home, just for you.")
 
-cp.sidebar_subtitle("Budget Calculator")
+# Side bar and main area after user signed in
+col1, col2 = st.columns([3, 1])
 
+# Main content area
+with col1:
+    st.subheader("Main Area")
+    st.write("This is the main content area. Here you can display your main application content.")
+    st.text_input("Enter something for the main area:")
+    st.button("Submit")
+
+# Content for the right "sidebar"
+with col2:
+    st.subheader("Preferences")
+    num_bedrooms = cp.user_slider("How many bedrooms would you prefer to have?", 
+              "So we can match you with homes that closely align with your preferences.")
+    num_bathrooms = cp.user_slider("How many bathrooms would you prefer to have?", 
+              "So we can match you with homes that closely align with your preferences.")
+
+# Create the dropdown menu with state acronyms
+cp.sidebar_subtitle("Location")
+selected_state = st.sidebar.selectbox("What state would you like to live in?", state_acronyms)
+cp.sidebar_subtitle("Budget Estimator")
 annual_income = cp.user_input("How much is your gross annual income?", 
               "Annual Gross Income", 
               "The amount of the income you make per year, before taxes.")
-
 monthly_debts = cp.user_input("How much are your monthly debts?", 
               "Monthly Debts", 
               "Recurring debts you owe each month, such as car payments, student loans, etc.")
-
 down_payment = cp.user_input("How much do you have saved for a down payment?", 
               "Down Payment", 
               "How much money you have saved for a down payment.")
-
 credit = 0
-
 credit = cp.user_input("(Optional) What is your credit score?", 
               "Credit Score", 
               "We use this to estimate a loan interest rate. If you choose not to provide your credit score, we will use average interest rates in your calculation.")
-
 income = annual_income/12
 
 #formula for maximum monthly mortgage payment
@@ -54,30 +86,28 @@ loan_amount = max_monthly_payment * ((1 + monthly_rate) ** n_payments - 1) / (mo
 #calculate maximum affordable home price
 max_home_price = loan_amount + down_payment
 
-max_home_price = f"{max_home_price:.2f}"
+if max_home_price < 0:
+    max_home_price = 0
+
+display_home_price = f"Based on your financial inputs, we recommend a budget of ${max_home_price:.2f}"
 
 #for 30 year term only rn
 def show_budget():
-    cp.main_subtitle(max_home_price)
+    cp.sidebar_subtitle(display_home_price)
 
 #create a button and call the function if it's clicked
 if st.sidebar.button("Generate Budget"):
     show_budget()
 
-cp.sidebar_subtitle("Preferences")
+#cp.sidebar_subtitle("Preferences")
 
-num_bedrooms = cp.user_slider("How many bedrooms would you prefer to have?", 
-              "So we can match you with homes that closely align with your preferences.")
 
-num_bathrooms = cp.user_slider("How many bathrooms would you prefer to have?", 
-              "So we can match you with homes that closely align with your preferences.")
 
-#import streamlit as st
-#import pandas as pd
-#import numpy as np
-#import folium
-#from streamlit_folium import st_folium
-
+#num_bedrooms = cp.user_slider("How many bedrooms would you prefer to have?", 
+#              "So we can match you with homes that closely align with your preferences.")
+#num_bathrooms = cp.user_slider("How many bathrooms would you prefer to have?", 
+#              "So we can match you with homes that closely align with your preferences.")
+        
 #def filter_housing(budget, location):
 #    # Placeholder function: Replace with actual filtering logic
 #    data = {
